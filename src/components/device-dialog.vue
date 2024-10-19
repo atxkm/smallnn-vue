@@ -34,7 +34,7 @@ function onSubmit() {
   
 }
 </script>
-<style scope lang="less">
+<style scoped lang="less">
 .btn-wrap {
   display: flex;
   justify-content: center;

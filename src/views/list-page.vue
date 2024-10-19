@@ -1,5 +1,5 @@
 <template>
-  <div class="wrap">
+  <div class="wrap" v-loading="loading">
     <div class="tool">
       <input ref="fileInput" type="file" @change="onUpload" />
       <el-button type="primary" @click="openUpload">上传</el-button>
@@ -37,12 +37,21 @@
 <script setup>
 import { ref } from "vue";
 import axios from "axios";
-import { ElMessageBox, ElNotification } from "element-plus";
+import { ElMessage, ElMessageBox, ElNotification } from "element-plus";
 import DeviceDialog from "../components/device-dialog.vue";
+// import CryptoJS from "crypto-js";
+import BMF from "browser-md5-file";
+import router from "@/router";
+
+if (!sessionStorage.getItem("login")) {
+  router.push("login");
+}
 
 const fileInput = ref();
 const dialogVisible = ref(false);
 const taskList = ref([]);
+const loading = ref(false);
+const bmf = new BMF();
 
 function openUpload() {
   fileInput.value.click();
@@ -50,30 +59,50 @@ function openUpload() {
 
 function onUpload(e) {
   const formData = new FormData();
-  formData.append("apkFile", e.currentTarget.files[0]);
-  formData.append("md5", '123123');
+  const file = e.currentTarget.files[0];
+  formData.append("apkFile", file);
 
-  axios
-    .post("/backend/upload", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    })
-    .then((data) => {
-      console.log(data);
-    });
-
-  // axios.post("/backend/upload").then((data) => {
-  //   console.log(data);
-  // });
-  // // let data = {
-  //   name: "smallNn",
-  //   version: "0.0.1",
-  //   package_name: "small.apk",
-  //   process: "80",
-  // };
-  // taskList.value.push(data);
+  loading.value = true;
+  bmf.md5(
+    file,
+    (err, md5) => {
+      formData.append("md5", md5);
+      axios
+        .post("/backend/upload", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then(({ data }) => {
+          loading.value = false;
+          fileInput.value.value = "";
+          let type = "error";
+          if (data.status === 1) {
+            type = "success";
+            getList();
+          }
+          ElMessage({
+            type: type,
+            message: data?.msg || "上传失败",
+            showClose: true,
+          });
+        });
+    },
+    (progress) => {
+      console.log("progress number:", progress);
+    }
+  );
 }
+
+function getList() {
+  axios.get("/backend/apklist").then(({ data }) => {
+    if (Array.isArray(data)) {
+      taskList.value = data;
+    }
+  });
+}
+
+getList();
 
 function openChoice() {
   dialogVisible.value = true;
@@ -91,13 +120,25 @@ function onCancel(scope) {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
   }).then(() => {
-    const { $index, row } = scope;
-    // taskList.value.splice($index, 1);
-    row.process = 0;
+    const { row } = scope;
+    cancelTask(row);
+  });
+}
+
+function cancelTask(row) {
+  axios.get("/backend/clear", { package: row.package }).then(({ data }) => {
+    if (data?.status === 1) {
+      getList();
+      ElMessage({
+        type: "info",
+        message: data.msg,
+        showClose: true,
+      });
+    }
   });
 }
 </script>
-<style scope lang="less">
+<style scoped lang="less">
 .tool {
   display: flex;
   justify-content: flex-end;
