@@ -96,7 +96,7 @@ function onUpload(e) {
 
 function getList() {
   axios.get("/backend/apklist").then(({ data }) => {
-    if (Array.isArray(data)) {
+    if (Array.isArray(data?.scanList)) {
       taskList.value = data;
     }
   });
