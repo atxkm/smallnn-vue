@@ -1,63 +1,33 @@
 <template>
+  <div class="bg"></div>
   <div class="wrap" v-loading="loading">
     <div class="tool">
       <input ref="fileInput" type="file" @change="onUpload" />
       <el-button type="primary" @click="openUpload">上传</el-button>
     </div>
-    <el-table :data="taskList">
-      <el-table-column label="app图标" width="80">
-        <template #default="scope">
-          <el-image
-            class="icon"
-            :src="`data:image/png;base64,${scope.row.icon}`"
-          />
-        </template>
-      </el-table-column>
-      <el-table-column prop="name" label="app名称" width="200" />
-      <el-table-column prop="version" label="版本号" width="100" />
-      <el-table-column prop="package" label="包名" width="230" />
-      <el-table-column label="脱壳进度" width="260">
-        <template #default="scope">
-          <el-progress :percentage="scope.row.process" />
-        </template>
-      </el-table-column>
-      <el-table-column label="选择设备" width="150">
-        <el-button @click="openChoice">选择设备</el-button>
-      </el-table-column>
-      <el-table-column label="操作" width="300">
-        <template #default="scope">
-          <el-button type="primary">开始</el-button>
-          <el-button @click="onDownload">下载</el-button>
-          <el-button @click="onCancel(scope)">取消</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+    <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
+      <el-tab-pane label="未扫描" name="unScanList">
+        <Table :table-data="unScanList" />
+      </el-tab-pane>
+      <el-tab-pane label="已扫描" name="scanList">
+        <Table :table-data="scanList" />
+      </el-tab-pane>
+    </el-tabs>
   </div>
-
-  <el-dialog v-model="dialogVisible">
-    <DeviceDialog
-      v-model="dialogVisible"
-      :data="deviceData"
-      @choice="onChoice"
-    />
-  </el-dialog>
 </template>
 <script setup>
 import { ref } from "vue";
 import axios from "axios";
-import { ElMessage, ElMessageBox, ElNotification } from "element-plus";
-import DeviceDialog from "../components/device-dialog.vue";
-// import CryptoJS from "crypto-js";
+import { ElMessage } from "element-plus";
 import BMF from "browser-md5-file";
-import router from "@/router";
 
-if (!sessionStorage.getItem("login")) {
-  router.push("login");
-}
+import Table from "../components/table.vue";
+
+const activeName = ref("unScanList");
 
 const fileInput = ref();
-const dialogVisible = ref(false);
-const taskList = ref([]);
+const scanList = ref([]);
+const unScanList = ref([]);
 const loading = ref(false);
 const bmf = new BMF();
 
@@ -105,46 +75,13 @@ function onUpload(e) {
 function getList() {
   axios.get("/backend/apklist").then(({ data }) => {
     if (Array.isArray(data?.scanList)) {
-      taskList.value = data?.scanList;
+      scanList.value = data?.scanList;
+      unScanList.value = data?.unScanList;
     }
   });
 }
 
 getList();
-
-function openChoice() {
-  dialogVisible.value = true;
-}
-
-function onChoice(data) {}
-
-function onDownload() {
-  ElNotification({ message: "下载开始..." });
-}
-
-function onCancel(scope) {
-  ElMessageBox.confirm("确认取消吗?", "确认", {
-    type: "warning",
-    confirmButtonText: "确定",
-    cancelButtonText: "取消",
-  }).then(() => {
-    const { row } = scope;
-    cancelTask(row);
-  });
-}
-
-function cancelTask(row) {
-  axios.get("/backend/clear", { package: row.package }).then(({ data }) => {
-    if (data?.status === 1) {
-      getList();
-      ElMessage({
-        type: "info",
-        message: data.msg,
-        showClose: true,
-      });
-    }
-  });
-}
 </script>
 <style scoped lang="less">
 .tool {
@@ -159,13 +96,21 @@ function cancelTask(row) {
 
 .wrap {
   max-width: 1366px;
+  min-height: 500px;
   margin: 0 auto;
   padding: 20px;
   border: 1px solid #dcdfe6;
+  border-radius: 10px;
+  background-color: #ffffff;
 }
 
-.icon {
-  width: 50px;
-  height: 50px;
+.bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 100vw;
+  height: 100vh;
+  background: url(../assets/images/login-bg.png) no-repeat center center / cover;
 }
 </style>

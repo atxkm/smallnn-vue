@@ -1,7 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import router from "@/router";
+
 import Login from '../views/login-page.vue';
 
-const router = createRouter({
+function beforeRouteEnter(to, from, next) {
+  if (!sessionStorage.getItem("login")) {
+    next();
+  } else {
+    router.push("login");
+  }
+}
+
+const routerConfig = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
@@ -16,9 +26,10 @@ const router = createRouter({
     {
       path: '/list',
       name: 'list',
-      component: () => import('../views/list-page.vue')
+      component: () => import('../views/list-page.vue'),
+      beforeRouteEnter,
     }
   ]
-})
+});
 
-export default router
+export default routerConfig;
