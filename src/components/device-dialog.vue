@@ -12,7 +12,7 @@
   <div class="btn-wrap">
     <el-button @click="onCancel">取消</el-button>
     <el-button v-if="phone" type="primary" @click="onSubmit">确定</el-button>
-    <el-button v-if="!phone" @click="phone = '1234'">模拟</el-button>
+    <el-button v-if="!phone" @click="simulate">模拟</el-button>
   </div>
 </template>
 <script setup>
@@ -53,6 +53,15 @@ function getDevices() {
 }
 
 getDevices();
+
+function simulate() {
+  devices.value = [
+    {
+      num: 12345,
+      state: "就绪",
+    },
+  ];
+}
 </script>
 <style scoped lang="less">
 .title {
