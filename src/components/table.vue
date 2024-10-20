@@ -26,7 +26,14 @@
     <el-table-column label="操作" width="260">
       <template #default="scope">
         <el-button type="primary">开始</el-button>
-        <el-button @click="onDownload(scope)">下载</el-button>
+        <a
+          v-if="scope.row.process >= 100"
+          class="el-button"
+          :href="`http://127。0.0.1:8090/download?package=${scope.row.package}`"
+          target="_blank"
+        >
+          下载
+        </a>
         <el-button @click="onCancel(scope)">取消</el-button>
       </template>
     </el-table-column>

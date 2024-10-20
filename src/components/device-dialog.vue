@@ -1,4 +1,5 @@
 <template>
+  <div class="title">请选择设备</div>
   <el-table ref="tableRef" :data="devices" highlight-current-row>
     <el-table-column width="80">
       <el-radio :value="num" name="radio" v-model="radio" />
@@ -49,6 +50,11 @@ function getDevices() {
 getDevices();
 </script>
 <style scoped lang="less">
+.title {
+  margin-bottom: 20px;
+  font-size: 16x;
+  font-weight: bold;
+}
 .btn-wrap {
   display: flex;
   justify-content: center;
