@@ -121,6 +121,11 @@ function startScan(scope) {
     .get(`/backend/scan?package=${row.package}&phone=${row.phone}`)
     .then(({ data }) => {
       if (data?.status === 1) {
+        ElMessage({
+          type: "success",
+          message: data.msg,
+          showClose: true,
+        });
         tk(scope);
       } else {
         ElMessage({
@@ -138,6 +143,17 @@ function tk(scope) {
     .get(`/backend/tk?package=${row.package}&phone=${row.phone}`)
     .then(({ data }) => {
       if (data?.status === 1) {
+        ElMessage({
+          type: "success",
+          message: data.msg,
+          showClose: true,
+        });
+      } else {
+        ElMessage({
+          type: "error",
+          message: data.msg,
+          showClose: true,
+        });
       }
     });
 }
