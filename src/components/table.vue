@@ -21,11 +21,22 @@
       </template>
     </el-table-column>
     <el-table-column label="选择设备">
-      <el-button @click="openChoice">选择设备</el-button>
+      <template #default="scope">
+        <el-button v-if="!scope.row.phone" @click="openChoice(scope)">
+          选择设备
+        </el-button>
+        <span v-else>{{ scope.row.phone }}</span>
+      </template>
     </el-table-column>
     <el-table-column label="操作" width="260">
       <template #default="scope">
-        <el-button type="primary">开始</el-button>
+        <el-button
+          v-if="scope.row.phone"
+          type="primary"
+          @click="startScan(scope)"
+        >
+          开始
+        </el-button>
         <a
           v-if="scope.row.process >= 100"
           class="el-button"
@@ -63,11 +74,17 @@ const { tableData } = toRefs(props);
 
 const dialogVisible = ref(false);
 
-function openChoice() {
+const curRow = ref();
+
+function openChoice(scope) {
   dialogVisible.value = true;
+  curRow.value = scope.row;
 }
 
-function onChoice() {}
+function onChoice(phone) {
+  dialogVisible.value = false;
+  curRow.value.phone = phone;
+}
 
 function onDownload(scope) {
   const { row } = scope;
@@ -96,6 +113,33 @@ function cancelTask(row) {
       });
     }
   });
+}
+
+function startScan(scope) {
+  const { row } = scope;
+  axios
+    .get(`/backend/scan?package=${row.package}&phone=${row.phone}`)
+    .then(({ data }) => {
+      if (data?.status === 1) {
+        tk(scope);
+      } else {
+        ElMessage({
+          type: "error",
+          message: data.msg,
+          showClose: true,
+        });
+      }
+    });
+}
+
+function tk(scope) {
+  const { row } = scope;
+  axios
+    .get(`/backend/tk?package=${row.package}&phone=${row.phone}`)
+    .then(({ data }) => {
+      if (data?.status === 1) {
+      }
+    });
 }
 </script>
 <style scoped lang="less">

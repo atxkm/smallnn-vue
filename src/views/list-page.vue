@@ -1,7 +1,7 @@
 <template>
   <div class="bg"></div>
   <div class="exit" @click="logout">退出登录</div>
-  <div class="wrap" v-loading="loading">
+  <div class="wrap" v-loading.fullscreen="loading">
     <div class="tool">
       <input ref="fileInput" type="file" @change="onUpload" />
       <el-button type="primary" @click="openUpload">上传</el-button>

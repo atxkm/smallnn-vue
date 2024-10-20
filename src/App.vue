@@ -27,5 +27,10 @@ body {
 .el-header {
   font-size: 16px;
   font-weight: bold;
+  color: #ffffff;
+}
+
+.el-footer {
+  color: #ffffff;
 }
 </style>

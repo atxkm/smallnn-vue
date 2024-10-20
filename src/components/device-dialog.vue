@@ -2,21 +2,24 @@
   <div class="title">请选择设备</div>
   <el-table ref="tableRef" :data="devices" highlight-current-row>
     <el-table-column width="80">
-      <el-radio :value="num" name="radio" v-model="radio" />
+      <template #default="scope">
+        <el-radio :value="scope.row.num" name="radio" v-model="phone" />
+      </template>
     </el-table-column>
     <el-table-column prop="num" label="序列号" />
     <el-table-column prop="state" label="状态" />
   </el-table>
   <div class="btn-wrap">
     <el-button @click="onCancel">取消</el-button>
-    <el-button type="primary" @click="onSubmit">确定</el-button>
+    <el-button v-if="phone" type="primary" @click="onSubmit">确定</el-button>
+    <el-button v-if="!phone" @click="phone = '1234'">模拟</el-button>
   </div>
 </template>
 <script setup>
 import { ref, toRefs } from "vue";
 import axios from "axios";
 
-const emits = defineEmits(["update:modelValue"]);
+const emit = defineEmits(["update:modelValue", "choice"]);
 
 const props = defineProps({
   row: {
@@ -31,13 +34,15 @@ const { row } = toRefs(props);
 
 const devices = ref([]);
 
-const radio = ref(null);
+const phone = ref(null);
 
 function onCancel() {
-  emits("update:modelValue", false);
+  emit("update:modelValue", false);
 }
 
-function onSubmit() {}
+function onSubmit() {
+  emit("choice", phone.value);
+}
 
 function getDevices() {
   axios.get("/backend/getdevices").then(({ data }) => {
