@@ -1,6 +1,6 @@
 <template>
   <el-table :data="tableData" fit="true">
-    <el-table-column label="app图标" width="80">
+    <el-table-column label="app图标">
       <template #default="scope">
         <el-image
           class="icon"
@@ -8,18 +8,22 @@
         />
       </template>
     </el-table-column>
-    <el-table-column prop="name" label="app名称" width="200" />
-    <el-table-column prop="version" label="版本号" width="100" />
-    <el-table-column prop="package" label="包名" width="230" />
-    <el-table-column label="脱壳进度" width="260">
+    <el-table-column prop="name" label="app名称" />
+    <el-table-column label="包名/版本号">
+      <template #default="scope">
+        <div>{{ scope.row.package }}</div>
+        <div>{{ scope.row.version }}</div>
+      </template>
+    </el-table-column>
+    <el-table-column label="脱壳进度">
       <template #default="scope">
         <el-progress :percentage="scope.row.process" />
       </template>
     </el-table-column>
-    <el-table-column label="选择设备" width="150">
+    <el-table-column label="选择设备">
       <el-button @click="openChoice">选择设备</el-button>
     </el-table-column>
-    <el-table-column label="操作" width="300">
+    <el-table-column label="操作" width="260">
       <template #default="scope">
         <el-button type="primary">开始</el-button>
         <el-button @click="onDownload(scope)">下载</el-button>
