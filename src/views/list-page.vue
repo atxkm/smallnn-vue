@@ -5,10 +5,18 @@
       <el-button type="primary" @click="openUpload">上传</el-button>
     </div>
     <el-table :data="taskList">
-      <el-table-column prop="name" label="app名称" />
-      <el-table-column prop="version" label="版本号" />
-      <el-table-column prop="package_name" label="包名" />
-      <el-table-column label="脱壳进度" width="200">
+      <el-table-column label="app图标" width="80">
+        <template #default="scope">
+          <el-image
+            class="icon"
+            :src="`data:image/png;base64,${scope.row.icon}`"
+          />
+        </template>
+      </el-table-column>
+      <el-table-column prop="name" label="app名称" width="200" />
+      <el-table-column prop="version" label="版本号" width="100" />
+      <el-table-column prop="package" label="包名" width="230" />
+      <el-table-column label="脱壳进度" width="260">
         <template #default="scope">
           <el-progress :percentage="scope.row.process" />
         </template>
@@ -97,7 +105,7 @@ function onUpload(e) {
 function getList() {
   axios.get("/backend/apklist").then(({ data }) => {
     if (Array.isArray(data?.scanList)) {
-      taskList.value = data;
+      taskList.value = data?.scanList;
     }
   });
 }
@@ -154,5 +162,10 @@ function cancelTask(row) {
   margin: 0 auto;
   padding: 20px;
   border: 1px solid #dcdfe6;
+}
+
+.icon {
+  width: 50px;
+  height: 50px;
 }
 </style>
