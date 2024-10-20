@@ -1,5 +1,6 @@
 <template>
   <div class="bg"></div>
+  <div class="exit" @click="logout">退出登录</div>
   <div class="wrap" v-loading="loading">
     <div class="tool">
       <input ref="fileInput" type="file" @change="onUpload" />
@@ -20,6 +21,7 @@ import { ref } from "vue";
 import axios from "axios";
 import { ElMessage } from "element-plus";
 import BMF from "browser-md5-file";
+import router from "@/router";
 
 import Table from "../components/table.vue";
 
@@ -100,6 +102,11 @@ function getProcess(row) {
       }
     });
 }
+
+function logout() {
+  sessionStorage.clear("login");
+  router.push("login");
+}
 </script>
 <style scoped lang="less">
 .tool {
@@ -130,5 +137,13 @@ function getProcess(row) {
   width: 100vw;
   height: 100vh;
   background: url(../assets/images/lg.jpg) no-repeat center center / cover;
+}
+
+.exit {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: #ffffff;
+  cursor: pointer;
 }
 </style>
