@@ -22,26 +22,24 @@
     <el-table-column label="操作" width="300">
       <template #default="scope">
         <el-button type="primary">开始</el-button>
-        <el-button @click="onDownload">下载</el-button>
+        <el-button @click="onDownload(scope)">下载</el-button>
         <el-button @click="onCancel(scope)">取消</el-button>
       </template>
     </el-table-column>
   </el-table>
 
-  <el-dialog v-model="dialogVisible">
-    <DeviceDialog
-      v-model="dialogVisible"
-      :data="deviceData"
-      @choice="onChoice"
-    />
+  <el-dialog v-model="dialogVisible" width="500">
+    <DeviceDialog v-model="dialogVisible" @choice="onChoice" />
   </el-dialog>
 </template>
 <script setup>
-import { ref, defineProps, toRefs } from "vue";
+import { ref, defineProps, toRefs, defineEmits } from "vue";
 import axios from "axios";
 
 import { ElMessage, ElMessageBox, ElNotification } from "element-plus";
 import DeviceDialog from "../components/device-dialog.vue";
+
+const emit = defineEmits(["refresh"]);
 
 const props = defineProps({
   tableData: {
@@ -60,7 +58,8 @@ function openChoice() {
 
 function onChoice() {}
 
-function onDownload() {
+function onDownload(scope) {
+  const { row } = scope;
   ElNotification({ message: "下载开始..." });
 }
 
@@ -76,11 +75,11 @@ function onCancel(scope) {
 }
 
 function cancelTask(row) {
-  axios.get("/backend/clear", { package: row.package }).then(({ data }) => {
+  axios.get(`/backend/clear?package=${row.package}`).then(({ data }) => {
     if (data?.status === 1) {
-      getList();
+      emit("refresh");
       ElMessage({
-        type: "info",
+        type: "success",
         message: data.msg,
         showClose: true,
       });

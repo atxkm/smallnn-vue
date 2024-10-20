@@ -13,9 +13,9 @@
           type="password"
         />
       </el-form-item>
-      <el-button class="login-btn" type="primary" @click="onLogin" size="large"
-        >登录</el-button
-      >
+      <el-button class="login-btn" type="primary" @click="onLogin" size="large">
+        登录
+      </el-button>
     </el-form>
   </div>
 </template>
@@ -49,10 +49,10 @@ function onLogin() {
   width: 260px;
   margin: 0 auto;
   padding: 50px 100px 100px;
-  border: 1px solid #dcdfe6;
   border-radius: 20px;
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(5px);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
 .title {
   display: flex;
@@ -60,6 +60,7 @@ function onLogin() {
   margin-bottom: 40px;
   font-weight: bold;
   font-size: 28px;
+  color: #2f2f2f;
 }
 .el-form {
   display: flex;
@@ -73,7 +74,7 @@ function onLogin() {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: url(../assets/images/login-bg.png) no-repeat center center / cover;
+  background: url(../assets/images/lg.jpg) no-repeat center center / cover;
 }
 
 .el-input {
@@ -85,7 +86,7 @@ function onLogin() {
 :deep(.el-form-item__label) {
   font-size: 16px;
   font-weight: bold;
-  color: #000000;
+  color: #2f2f2f;
 }
 
 .login-btn {

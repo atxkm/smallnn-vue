@@ -7,10 +7,10 @@
     </div>
     <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
       <el-tab-pane label="未扫描" name="unScanList">
-        <Table :table-data="unScanList" />
+        <Table :table-data="unScanList" @refresh="onRefresh" />
       </el-tab-pane>
       <el-tab-pane label="已扫描" name="scanList">
-        <Table :table-data="scanList" />
+        <Table :table-data="scanList" @refresh="onRefresh" />
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -77,11 +77,29 @@ function getList() {
     if (Array.isArray(data?.scanList)) {
       scanList.value = data?.scanList;
       unScanList.value = data?.unScanList;
+
+      scanList.value.map((row) => {
+        row.progress = getProcess(row);
+      });
     }
   });
 }
 
 getList();
+
+function onRefresh() {
+  getList();
+}
+
+function getProcess(row) {
+  axios
+    .get(`/backend/progress?package=${row.package}&flag=tk`)
+    .then(({ data }) => {
+      if (data?.process && data.progress > 0) {
+        row.progress = data.process;
+      }
+    });
+}
 </script>
 <style scoped lang="less">
 .tool {
@@ -111,6 +129,6 @@ getList();
   z-index: -1;
   width: 100vw;
   height: 100vh;
-  background: url(../assets/images/login-bg.png) no-repeat center center / cover;
+  background: url(../assets/images/lg.jpg) no-repeat center center / cover;
 }
 </style>

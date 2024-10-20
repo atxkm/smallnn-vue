@@ -1,8 +1,10 @@
 <template>
-  <el-table ref="tableRef" border :data="data">
-    <el-table-column type="selection" />
-    <el-table-column prop="date" label="序列号" />
-    <el-table-column prop="date" label="状态" />
+  <el-table ref="tableRef" :data="devices" highlight-current-row>
+    <el-table-column width="80">
+      <el-radio :value="num" name="radio" v-model="radio" />
+    </el-table-column>
+    <el-table-column prop="num" label="序列号" />
+    <el-table-column prop="state" label="状态" />
   </el-table>
   <div class="btn-wrap">
     <el-button @click="onCancel">取消</el-button>
@@ -11,28 +13,40 @@
 </template>
 <script setup>
 import { ref, toRefs } from "vue";
+import axios from "axios";
 
 const emits = defineEmits(["update:modelValue"]);
 
 const props = defineProps({
-  data: {
-    type: Array,
-    default: () => [],
+  row: {
+    type: Object,
+    default: () => ({}),
   },
 });
 
 const tableRef = ref();
 
-const { data } = toRefs(props);
+const { row } = toRefs(props);
+
+const devices = ref([]);
+
+const radio = ref(null);
 
 function onCancel() {
   emits("update:modelValue", false);
 }
 
-function onSubmit() {
-  const selection = tableRef.value.getSelectionRows();
-  
+function onSubmit() {}
+
+function getDevices() {
+  axios.get("/backend/getdevices").then(({ data }) => {
+    if (Array.isArray(data?.devices)) {
+      devices.value = data?.devices;
+    }
+  });
 }
+
+getDevices();
 </script>
 <style scoped lang="less">
 .btn-wrap {

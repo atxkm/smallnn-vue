@@ -2,7 +2,7 @@
   <el-container>
     <el-header>逆向App</el-header>
     <el-main>
-      <RouterView />
+      <router-view />
     </el-main>
     <el-footer>版权说明</el-footer>
   </el-container>
