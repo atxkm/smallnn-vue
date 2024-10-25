@@ -31,7 +31,7 @@
     <el-table-column label="操作" width="260">
       <template #default="scope">
         <el-button
-          v-if="scope.row.phone && scope.row.progress <= 0"
+          v-if="scope.row.phone"
           type="primary"
           @click="startScan(scope)"
         >
@@ -59,7 +59,7 @@ import { ref, defineProps, toRefs, defineEmits } from "vue";
 import axios from "axios";
 import { getProcess } from "@/mixins/progress";
 
-import { ElMessage, ElMessageBox, ElNotification } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import DeviceDialog from "../components/device-dialog.vue";
 
 const emit = defineEmits(["refresh"]);
