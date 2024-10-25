@@ -1,6 +1,6 @@
 <template>
   <el-table :data="tableData" fit="true">
-    <el-table-column label="app图标">
+    <el-table-column label="app图标" width="80">
       <template #default="scope">
         <el-image
           class="icon"
@@ -17,12 +17,12 @@
     </el-table-column>
     <el-table-column label="脱壳进度">
       <template #default="scope">
-        <el-progress :percentage="scope.row.process" />
+        <el-progress :percentage="scope.row.progress" stroke-width="20" text-inside :color="colors" />
       </template>
     </el-table-column>
     <el-table-column label="选择设备">
       <template #default="scope">
-        <el-button v-if="!scope.row.phone" @click="openChoice(scope)">
+        <el-button v-if="!scope.row.phone" @click="openChoice(scope)" :disabled="scope.row.progress > 0">
           选择设备
         </el-button>
         <span v-else>{{ scope.row.phone }}</span>
@@ -38,10 +38,10 @@
           开始
         </el-button>
         <a
-          v-if="scope.row.process >= 100"
-          class="el-button"
-          :href="`http://127。0.0.1:8090/download?package=${scope.row.package}`"
-          target="_blank"
+          v-if="scope.row.progress >= 100"
+          class="el-button el-button--primary"
+          :href="`http://127.0.0.1:8090/download?package=${scope.row.package}`"
+          :download="scope.row.packge"
         >
           下载
         </a>
@@ -51,12 +51,13 @@
   </el-table>
 
   <el-dialog v-model="dialogVisible" width="500">
-    <DeviceDialog v-model="dialogVisible" @choice="onChoice" />
+    <DeviceDialog v-if="dialogVisible" v-model="dialogVisible" @choice="onChoice" />
   </el-dialog>
 </template>
 <script setup>
 import { ref, defineProps, toRefs, defineEmits } from "vue";
 import axios from "axios";
+import { getProcess } from "@/mixins/progress";
 
 import { ElMessage, ElMessageBox, ElNotification } from "element-plus";
 import DeviceDialog from "../components/device-dialog.vue";
@@ -86,11 +87,6 @@ function onChoice(phone) {
   curRow.value.phone = phone;
 }
 
-function onDownload(scope) {
-  const { row } = scope;
-  ElNotification({ message: "下载开始..." });
-}
-
 function onCancel(scope) {
   ElMessageBox.confirm("确认取消吗?", "确认", {
     type: "warning",
@@ -116,17 +112,39 @@ function cancelTask(row) {
 }
 
 function startScan(scope) {
+  tk(scope);
+  // const { row } = scope;
+  // axios
+  //   .get(`/backend/scan?package=${row.package}&phone=${row.phone}`)
+  //   .then(({ data }) => {
+  //     if (data?.status === 1) {
+  //       ElMessage({
+  //         type: "success",
+  //         message: data.msg,
+  //         showClose: true,
+  //       });
+  //     } else {
+  //       ElMessage({
+  //         type: "error",
+  //         message: data.msg,
+  //         showClose: true,
+  //       });
+  //     }
+  //   });
+}
+
+function tk(scope) {
   const { row } = scope;
   axios
-    .get(`/backend/scan?package=${row.package}&phone=${row.phone}`)
+    .get(`/backend/tk?package=${row.package}&phone=${row.phone}`)
     .then(({ data }) => {
       if (data?.status === 1) {
+        getProcess(row);
         ElMessage({
           type: "success",
           message: data.msg,
           showClose: true,
         });
-        tk(scope);
       } else {
         ElMessage({
           type: "error",
@@ -137,30 +155,19 @@ function startScan(scope) {
     });
 }
 
-function tk(scope) {
-  const { row } = scope;
-  axios
-    .get(`/backend/tk?package=${row.package}&phone=${row.phone}`)
-    .then(({ data }) => {
-      if (data?.status === 1) {
-        ElMessage({
-          type: "success",
-          message: data.msg,
-          showClose: true,
-        });
-      } else {
-        ElMessage({
-          type: "error",
-          message: data.msg,
-          showClose: true,
-        });
-      }
-    });
-}
+const colors = [
+  { color: '#f56c6c', percentage: 30 },
+  { color: '#e6a23c', percentage: 70 },
+  { color: '#67c23a', percentage: 100 },
+];
 </script>
 <style scoped lang="less">
 .icon {
   width: 50px;
   height: 50px;
+}
+
+a.el-button {
+  text-decoration: none;
 }
 </style>

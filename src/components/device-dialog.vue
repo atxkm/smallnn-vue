@@ -11,26 +11,17 @@
   </el-table>
   <div class="btn-wrap">
     <el-button @click="onCancel">取消</el-button>
-    <el-button v-if="phone" type="primary" @click="onSubmit">确定</el-button>
-    <el-button v-if="!phone" @click="simulate">模拟</el-button>
+    <el-button :disabled="!phone" type="primary" @click="onSubmit">确定</el-button>
   </div>
 </template>
 <script setup>
-import { ref, toRefs } from "vue";
+import { ref } from "vue";
 import axios from "axios";
 
 const emit = defineEmits(["update:modelValue", "choice"]);
 
-const props = defineProps({
-  row: {
-    type: Object,
-    default: () => ({}),
-  },
-});
 
 const tableRef = ref();
-
-const { row } = toRefs(props);
 
 const devices = ref([]);
 
@@ -53,15 +44,6 @@ function getDevices() {
 }
 
 getDevices();
-
-function simulate() {
-  devices.value = [
-    {
-      num: 12345,
-      state: "就绪",
-    },
-  ];
-}
 </script>
 <style scoped lang="less">
 .title {

@@ -22,6 +22,7 @@ import axios from "axios";
 import { ElMessage } from "element-plus";
 import BMF from "browser-md5-file";
 import router from "@/router";
+import { getProcess } from "@/mixins/progress";
 
 import Table from "../components/table.vue";
 
@@ -83,6 +84,10 @@ function getList() {
       scanList.value.map((row) => {
         row.progress = getProcess(row);
       });
+
+      unScanList.value.map((row) => {
+        row.progress = getProcess(row);
+      });
     }
   });
 }
@@ -91,16 +96,6 @@ getList();
 
 function onRefresh() {
   getList();
-}
-
-function getProcess(row) {
-  axios
-    .get(`/backend/progress?package=${row.package}&flag=tk`)
-    .then(({ data }) => {
-      if (data?.process && data.progress > 0) {
-        row.progress = data.process;
-      }
-    });
 }
 
 function logout() {
