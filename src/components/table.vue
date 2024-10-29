@@ -1,5 +1,5 @@
 <template>
-  <el-table :data="tableData" fit="true">
+  <el-table :data="tableData" :fit="true">
     <el-table-column label="app图标" width="80">
       <template #default="scope">
         <el-image
@@ -8,16 +8,26 @@
         />
       </template>
     </el-table-column>
-    <el-table-column prop="name" label="app名称" />
+    <el-table-column prop="name" label="app名称" sortable />
     <el-table-column label="包名/版本号">
       <template #default="scope">
         <div>{{ scope.row.package }}</div>
         <div>{{ scope.row.version }}</div>
       </template>
     </el-table-column>
+    <el-table-column label="是否脱壳" width="80">
+      <template #default="scope">
+        <el-tooltip :content="scope.row.isTK ? '是': '否'" placement="top">
+          <el-icon>
+            <Unlock v-if="isTk(scope.row)"  color="#67c23a" />
+            <Lock v-else />
+          </el-icon>
+        </el-tooltip>
+      </template>
+    </el-table-column>
     <el-table-column label="脱壳进度">
       <template #default="scope">
-        <el-progress :percentage="scope.row.progress" stroke-width="20" text-inside :color="colors" />
+        <el-progress :percentage="scope.row.progress" :stroke-width="20" text-inside :color="colors" />
       </template>
     </el-table-column>
     <el-table-column label="选择设备">
@@ -31,21 +41,22 @@
     <el-table-column label="操作" width="260">
       <template #default="scope">
         <el-button
-          v-if="scope.row.phone"
+          v-if="scope.row.phone && scope.row.progress <= 0"
           type="primary"
           @click="startScan(scope)"
         >
           开始
         </el-button>
         <a
-          v-if="scope.row.progress >= 100"
+          v-if="isTk(scope.row)"
           class="el-button el-button--primary"
           :href="`http://127.0.0.1:8090/download?package=${scope.row.package}`"
           :download="scope.row.packge"
+          target="_blank"
         >
           下载
         </a>
-        <el-button @click="onCancel(scope)">取消</el-button>
+        <el-button v-if="!scope.row.isTK" @click="onCancel(scope)">取消</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -60,6 +71,7 @@ import axios from "axios";
 import { getProcess } from "@/mixins/progress";
 
 import { ElMessage, ElMessageBox } from "element-plus";
+import { Lock, Unlock } from "@element-plus/icons-vue";
 import DeviceDialog from "../components/device-dialog.vue";
 
 const emit = defineEmits(["refresh"]);
@@ -160,6 +172,10 @@ const colors = [
   { color: '#e6a23c', percentage: 70 },
   { color: '#67c23a', percentage: 100 },
 ];
+
+function isTk(row) {
+  return row.isTK && row.progress >= 100;
+}
 </script>
 <style scoped lang="less">
 .icon {
@@ -169,5 +185,9 @@ const colors = [
 
 a.el-button {
   text-decoration: none;
+}
+
+.el-icon {
+  font-size: 18px;
 }
 </style>

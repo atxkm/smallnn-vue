@@ -6,14 +6,14 @@
       <input ref="fileInput" type="file" @change="onUpload" />
       <el-button type="primary" @click="openUpload">上传</el-button>
     </div>
-    <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
-      <el-tab-pane label="未扫描" name="unScanList">
+    <!-- <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick"> -->
+      <!-- <el-tab-pane label="未扫描" name="unScanList">
         <Table :table-data="unScanList" @refresh="onRefresh" />
       </el-tab-pane>
       <el-tab-pane label="已扫描" name="scanList">
-        <Table :table-data="scanList" @refresh="onRefresh" />
-      </el-tab-pane>
-    </el-tabs>
+      </el-tab-pane> -->
+    <!-- </el-tabs> -->
+    <Table :table-data="scanList" @refresh="onRefresh" />
   </div>
 </template>
 <script setup>
@@ -70,7 +70,7 @@ function onUpload(e) {
         });
     },
     (progress) => {
-      console.log("progress number:", progress);
+      // console.log("progress number:", progress);
     }
   );
 }
@@ -78,16 +78,18 @@ function onUpload(e) {
 function getList() {
   axios.get("/backend/apklist").then(({ data }) => {
     if (Array.isArray(data?.scanList)) {
-      scanList.value = data?.scanList;
-      unScanList.value = data?.unScanList;
+      let list = data?.scanList || [];
+      let uList = data?.unScanList || [];
+
+      scanList.value = uList.concat(list);
 
       scanList.value.map((row) => {
         row.progress = getProcess(row);
       });
 
-      unScanList.value.map((row) => {
-        row.progress = getProcess(row);
-      });
+      // unScanList.value.map((row) => {
+      //   row.progress = getProcess(row);
+      // });
     }
   });
 }
@@ -101,6 +103,10 @@ function onRefresh() {
 function logout() {
   sessionStorage.clear("login");
   router.push("login");
+}
+
+window.onbeforeunload = function () {
+  return '退出将无法下载脱壳的APK，确认退出？';
 }
 </script>
 <style scoped lang="less">
