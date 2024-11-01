@@ -19,7 +19,7 @@
       <template #default="scope">
         <el-tooltip :content="scope.row.isTK ? '是': '否'" placement="top">
           <el-icon>
-            <Unlock v-if="isTk(scope.row)"  color="#67c23a" />
+            <Unlock v-if="isTk(scope.row)" color="#67c23a" />
             <Lock v-else />
           </el-icon>
         </el-tooltip>
@@ -51,7 +51,7 @@
           v-if="isTk(scope.row)"
           class="el-button el-button--primary"
           :href="`http://127.0.0.1:8090/download?package=${scope.row.package}`"
-          :download="scope.row.packge"
+          :download="scope.row.package"
           target="_blank"
         >
           下载
@@ -125,24 +125,6 @@ function cancelTask(row) {
 
 function startScan(scope) {
   tk(scope);
-  // const { row } = scope;
-  // axios
-  //   .get(`/backend/scan?package=${row.package}&phone=${row.phone}`)
-  //   .then(({ data }) => {
-  //     if (data?.status === 1) {
-  //       ElMessage({
-  //         type: "success",
-  //         message: data.msg,
-  //         showClose: true,
-  //       });
-  //     } else {
-  //       ElMessage({
-  //         type: "error",
-  //         message: data.msg,
-  //         showClose: true,
-  //       });
-  //     }
-  //   });
 }
 
 function tk(scope) {
@@ -157,6 +139,7 @@ function tk(scope) {
           message: data.msg,
           showClose: true,
         });
+        emit("refresh");
       } else {
         ElMessage({
           type: "error",

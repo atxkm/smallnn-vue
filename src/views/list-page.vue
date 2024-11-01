@@ -1,18 +1,16 @@
 <template>
   <div class="bg"></div>
-  <div class="exit" @click="logout">退出登录</div>
+  <el-popconfirm title="退出将无法下载脱壳的APK，确认退出?" @confirm="logout" confirm-button-text="是"
+  cancel-button-text="否" width="200">
+    <template #reference>
+      <div class="exit">退出登录</div>
+    </template>
+  </el-popconfirm>
   <div class="wrap" v-loading.fullscreen="loading">
     <div class="tool">
       <input ref="fileInput" type="file" @change="onUpload" />
       <el-button type="primary" @click="openUpload">上传</el-button>
     </div>
-    <!-- <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick"> -->
-      <!-- <el-tab-pane label="未扫描" name="unScanList">
-        <Table :table-data="unScanList" @refresh="onRefresh" />
-      </el-tab-pane>
-      <el-tab-pane label="已扫描" name="scanList">
-      </el-tab-pane> -->
-    <!-- </el-tabs> -->
     <Table :table-data="scanList" @refresh="onRefresh" />
   </div>
 </template>
@@ -101,8 +99,8 @@ function onRefresh() {
 }
 
 function logout() {
-  sessionStorage.clear("login");
   router.push("login");
+  sessionStorage.clear("login");
 }
 
 window.onbeforeunload = function () {
